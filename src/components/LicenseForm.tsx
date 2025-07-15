@@ -1,6 +1,6 @@
 import {  reserves, weaponClasses, times, restrictions, ReserveName} from "../data/reserves";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import styles from "./LicenseForm.module.scss";
 
 function getRandom<T>(arr: readonly T[]): T {
@@ -14,7 +14,7 @@ function getRandomNumber(min: number, max: number): number {
 const sexes = ["Male", "Female", "Any"] as const;
 
 export default function LicenseForm() {
-  const [license, setLicense] = useState<ReserveName | null>(null);
+  const [selectedReserve, setSelectedReserve] = useState<ReserveName | null>(null);
   const [species, setSpecies] = useState("");
   const [tripDays, setTripDays] = useState(1);
   const [limit, setLimit] = useState(1);
@@ -23,12 +23,9 @@ export default function LicenseForm() {
   const [shootingTime, setShootingTime] = useState("");
   const [restriction, setRestriction] = useState("");
 
-  function generateLicense() {
-    const reserveKeys = Object.keys(reserves) as ReserveName[];
-    const randomReserve = getRandom(reserveKeys);
-    const reserveData = reserves[randomReserve];
+  function generateLicenseData(reserveName: ReserveName) {
+    const reserveData = reserves[reserveName];
 
-    setLicense(randomReserve);
     setSpecies(getRandom(reserveData.species));
     setTripDays(getRandomNumber(1, 7));
     setLimit(getRandomNumber(1, 5));
@@ -38,13 +35,36 @@ export default function LicenseForm() {
     setRestriction(getRandom(restrictions));
   }
 
-  useEffect(() => {
-    generateLicense();
-  }, []);
+  function handleReserveSelection(reserveName: ReserveName) {
+    setSelectedReserve(reserveName);
+    generateLicenseData(reserveName);
+  }
 
-  if (!license) return <p className={styles.container}>Generating license...</p>;
+  function regenerateTag() {
+    if (selectedReserve) {
+      generateLicenseData(selectedReserve);
+    }
+  }
 
-  const reserve = reserves[license];
+  if (!selectedReserve) {
+    return (
+      <div className={styles.container}>
+        <h2>Select a Reserve</h2>
+        <select 
+          onChange={(e) => handleReserveSelection(e.target.value as ReserveName)} 
+          defaultValue=""
+          className={styles.selector}
+        >
+          <option value="" disabled>Choose a hunting reserve...</option>
+          {Object.keys(reserves).map((key) => (
+            <option key={key} value={key}>{reserves[key as ReserveName].label}</option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  const reserve = reserves[selectedReserve];
 
   return (
     <div className={styles.container}>
@@ -63,7 +83,10 @@ export default function LicenseForm() {
         <li><b>Restrictions:</b> {restriction}</li>
       </ul>
 
-      <button onClick={generateLicense}>Generate New Tag</button>
+      <div className={styles.buttonGroup}>
+        <button onClick={regenerateTag}>Generate New Tag</button>
+        <button onClick={() => setSelectedReserve(null)}>Change Reserve</button>
+      </div>
     </div>
   );
 }
