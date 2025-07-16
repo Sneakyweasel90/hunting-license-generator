@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "License Generator",
+  "name": "Hunter License Generator",
   "icons": [
     {
       "src": "favicon.ico",
