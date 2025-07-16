@@ -1,5 +1,4 @@
 import {  reserves, weaponClasses, times, restrictions, ReserveName} from "../data/reserves";
-import { Analytics } from "@vercel/analytics/react"
 import { useState } from "react";
 import styles from "./LicenseForm.module.scss";
 
@@ -87,8 +86,6 @@ export default function LicenseForm() {
         <button onClick={regenerateTag}>Generate New Tag</button>
         <button onClick={() => setSelectedReserve(null)}>Change Reserve</button>
       </div>
-    <Analytics />
     </div>
-    
   );
 }
